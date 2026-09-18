@@ -1,0 +1,53 @@
+openapi: 3.0.3
+info:
+  title: allOf fixtures
+  version: test
+components:
+  schemas:
+    Base:
+      type: object
+      properties:
+        base:
+          type: string
+      required: [base]
+    Middle:
+      allOf:
+        - $ref: '#/components/schemas/Base'
+      type: object
+      properties:
+        middle:
+          type: boolean
+      required: [middle]
+    Derived:
+      allOf:
+        - $ref: '#/components/schemas/Middle'
+      type: object
+      properties:
+        base:
+          type: integer
+        own:
+          type: string
+      required: [own]
+    Metadata:
+      type: string
+    Wrapped:
+      type: object
+      properties:
+        metadata:
+          description: metadata description
+          allOf:
+            - $ref: '#/components/schemas/Metadata'
+    CycleA:
+      allOf:
+        - $ref: '#/components/schemas/CycleB'
+      type: object
+      properties:
+        a:
+          type: string
+    CycleB:
+      allOf:
+        - $ref: '#/components/schemas/CycleA'
+      type: object
+      properties:
+        b:
+          type: string
