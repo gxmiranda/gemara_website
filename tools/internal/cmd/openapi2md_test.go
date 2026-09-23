@@ -87,6 +87,51 @@ func TestResolveSchemaCompositionPreservesXStatus(t *testing.T) {
 	}
 }
 
+func TestFormatFieldTypeResolvesItemsAllOf(t *testing.T) {
+	spec := loadAllOfFixture(t)
+	schema, err := resolveSchemaByName("ItemsAllOfArray", spec, make(map[string]bool))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	itemsBytes, err := yaml.Marshal(schema.Properties["entries"])
+	if err != nil {
+		t.Fatal(err)
+	}
+	var entries Schema
+	if err := yaml.Unmarshal(itemsBytes, &entries); err != nil {
+		t.Fatal(err)
+	}
+	itemsBytes, err = yaml.Marshal(entries.Items)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var items Schema
+	if err := yaml.Unmarshal(itemsBytes, &items); err != nil {
+		t.Fatal(err)
+	}
+	firstPart, err := parseSchema(items.AllOf[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	resolved, err := resolveSchemaComposition(items, spec, make(map[string]bool))
+	if err != nil {
+		t.Fatal(err)
+	}
+	resolved.Ref = firstPart.Ref
+	if !contains(resolved.Required, "id") {
+		t.Fatal("resolved items lost inline required field id")
+	}
+	if _, ok := resolved.Properties["extra"]; !ok {
+		t.Fatal("resolved items lost inline property extra")
+	}
+
+	output := generateRootSection("ItemsAllOfArray", schema, spec, map[string]string{})
+	if !strings.Contains(output, "array[ItemTarget]") {
+		t.Fatalf("resolved item type missing from generated output:\n%s", output)
+	}
+}
+
 func contains(values []string, want string) bool {
 	for _, value := range values {
 		if value == want {

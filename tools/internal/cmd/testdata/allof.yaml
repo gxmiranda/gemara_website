@@ -47,6 +47,26 @@ components:
         - $ref: '#/components/schemas/StatusBase'
       type: object
       x-status: experimental
+    ItemTarget:
+      type: object
+      properties:
+        id:
+          type: string
+      required: [id]
+    ItemsAllOfArray:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/ItemTarget'
+              - required:
+                  - id
+            properties:
+              extra:
+                type: string
+            type: object
     CycleA:
       allOf:
         - $ref: '#/components/schemas/CycleB'

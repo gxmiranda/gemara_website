@@ -600,6 +600,16 @@ func formatFieldType(fieldSchema Schema, spec OpenAPISpec, schemaToFile map[stri
 			itemsBytes, _ := yaml.Marshal(fieldSchema.Items)
 			var itemsSchema Schema
 			if err := yaml.Unmarshal(itemsBytes, &itemsSchema); err == nil {
+				if len(itemsSchema.AllOf) > 0 {
+					firstPart, _ := parseSchema(itemsSchema.AllOf[0])
+					resolvedItems, resolveErr := resolveSchemaComposition(itemsSchema, spec, make(map[string]bool))
+					if resolveErr == nil {
+						if firstPart.Ref != "" {
+							resolvedItems.Ref = firstPart.Ref
+						}
+						itemsSchema = resolvedItems
+					}
+				}
 				var itemType string
 				var itemTypeLink string
 				if itemsSchema.Ref != "" {
