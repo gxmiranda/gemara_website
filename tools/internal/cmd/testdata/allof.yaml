@@ -67,6 +67,19 @@ components:
               extra:
                 type: string
             type: object
+    CUENoteSchema:
+      type: object
+      description: |-
+        items is a list
+
+        (Enforced by the CUE schema; not by this OpenAPI projection.)
+      properties:
+        name:
+          type: string
+          description: |-
+            name of the item
+
+            (Enforced by the CUE schema; not by this OpenAPI projection.)
     CycleA:
       allOf:
         - $ref: '#/components/schemas/CycleB'

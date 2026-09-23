@@ -282,8 +282,8 @@ func generateAliasBlock(name string, schema Schema, subheading bool) string {
 		level = "###"
 	}
 	buf.WriteString(fmt.Sprintf("%s `%s`\n\n", level, name))
-	if schema.Description != "" {
-		buf.WriteString(schema.Description + "\n\n")
+	if description := stripCUEProjectionNotes(schema.Description); description != "" {
+		buf.WriteString(description + "\n\n")
 	}
 	buf.WriteString(fmt.Sprintf("- **Type**: `%s`\n", schema.Type))
 	if schema.Format != "" {
@@ -575,7 +575,12 @@ func formatFieldInline(fieldName string, fieldSchema Schema, spec OpenAPISpec, p
 		}
 	}
 
-	return fieldLine, description
+	return fieldLine, stripCUEProjectionNotes(description)
+}
+
+func stripCUEProjectionNotes(description string) string {
+	const marker = "(Enforced by the CUE schema; not by this OpenAPI projection.)"
+	return strings.TrimSpace(strings.ReplaceAll(description, marker, ""))
 }
 
 // formatFieldType returns the type string for a field with markdown links for custom types
@@ -655,8 +660,8 @@ func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, schem
 	if status := getSchemaStatus(schema); status != "" {
 		buf.WriteString(formatStatusBadge(status) + "\n\n")
 	}
-	if schema.Description != "" {
-		buf.WriteString(schema.Description + "\n\n")
+	if description := stripCUEProjectionNotes(schema.Description); description != "" {
+		buf.WriteString(description + "\n\n")
 	}
 
 	if schema.Properties != nil {

@@ -132,6 +132,28 @@ func TestFormatFieldTypeResolvesItemsAllOf(t *testing.T) {
 	}
 }
 
+func TestStripCUEProjectionNotes(t *testing.T) {
+	if got := stripCUEProjectionNotes("description\n\n(Enforced by the CUE schema; not by this OpenAPI projection.)"); got != "description" {
+		t.Fatalf("stripped description = %q, want description", got)
+	}
+	if got := stripCUEProjectionNotes("description"); got != "description" {
+		t.Fatalf("clean description changed to %q", got)
+	}
+
+	spec := loadAllOfFixture(t)
+	schema, err := resolveSchemaByName("CUENoteSchema", spec, make(map[string]bool))
+	if err != nil {
+		t.Fatal(err)
+	}
+	output := generateRootSection("CUENoteSchema", schema, spec, map[string]string{})
+	if strings.Contains(output, "Enforced by the CUE schema") {
+		t.Fatalf("CUE projection note leaked into generated output:\n%s", output)
+	}
+	if !strings.Contains(output, "items is a list") || !strings.Contains(output, "name of the item") {
+		t.Fatalf("description text missing from generated output:\n%s", output)
+	}
+}
+
 func contains(values []string, want string) bool {
 	for _, value := range values {
 		if value == want {
