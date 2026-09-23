@@ -37,6 +37,16 @@ components:
           description: metadata description
           allOf:
             - $ref: '#/components/schemas/Metadata'
+    StatusBase:
+      type: object
+      properties:
+        name:
+          type: string
+    StatusDerived:
+      allOf:
+        - $ref: '#/components/schemas/StatusBase'
+      type: object
+      x-status: experimental
     CycleA:
       allOf:
         - $ref: '#/components/schemas/CycleB'

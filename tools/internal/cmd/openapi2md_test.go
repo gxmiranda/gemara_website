@@ -71,6 +71,22 @@ func TestGenerateRootSectionPreservesWrappedDescription(t *testing.T) {
 	}
 }
 
+func TestResolveSchemaCompositionPreservesXStatus(t *testing.T) {
+	spec := loadAllOfFixture(t)
+	schema, err := resolveSchemaByName("StatusDerived", spec, make(map[string]bool))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if schema.XStatus != "experimental" {
+		t.Fatalf("x-status = %q, want experimental", schema.XStatus)
+	}
+
+	output := generateRootSection("StatusDerived", schema, spec, map[string]string{})
+	if !strings.Contains(output, "badge-experimental") {
+		t.Fatalf("status badge missing from generated output:\n%s", output)
+	}
+}
+
 func contains(values []string, want string) bool {
 	for _, value := range values {
 		if value == want {

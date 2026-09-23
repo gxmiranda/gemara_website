@@ -482,6 +482,9 @@ func mergeSchemas(target *Schema, source Schema) {
 	if source.Items != nil {
 		target.Items = source.Items
 	}
+	if source.XStatus != "" {
+		target.XStatus = source.XStatus
+	}
 	if source.Properties != nil {
 		if target.Properties == nil {
 			target.Properties = make(map[string]interface{})
