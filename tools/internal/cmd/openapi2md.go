@@ -257,7 +257,7 @@ func convertPerFile(inputFile, outputDir, manifestPath string) error {
 			}
 			schema, err := resolveSchemaByName(name, spec, make(map[string]bool))
 			if err != nil {
-				continue
+				return fmt.Errorf("failed to resolve schema %q: %w", name, err)
 			}
 			if isAlias(schema) {
 				buf.WriteString(generateAliasBlock(name, schema, false))
