@@ -154,6 +154,25 @@ func TestStripCUEProjectionNotes(t *testing.T) {
 	}
 }
 
+func TestPropertyAllOfPreservesRef(t *testing.T) {
+	spec := loadAllOfFixture(t)
+	schema, err := resolveSchemaByName("PropRefAllOf", spec, make(map[string]bool))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	output := generateRootSection("PropRefAllOf", schema, spec, map[string]string{})
+	if !strings.Contains(output, "**RefTarget**") {
+		t.Fatalf("property allOf $ref lost — expected **RefTarget** in output:\n%s", output)
+	}
+	if strings.Contains(output, "**object**") {
+		t.Fatalf("property allOf rendered as bare object instead of linked type:\n%s", output)
+	}
+	if !strings.Contains(output, "log maps to the entry") {
+		t.Fatalf("property description lost:\n%s", output)
+	}
+}
+
 func contains(values []string, want string) bool {
 	for _, value := range values {
 		if value == want {

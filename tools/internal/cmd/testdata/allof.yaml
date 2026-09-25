@@ -80,6 +80,19 @@ components:
             name of the item
 
             (Enforced by the CUE schema; not by this OpenAPI projection.)
+    RefTarget:
+      type: object
+      properties:
+        entry-id:
+          type: string
+      required: [entry-id]
+    PropRefAllOf:
+      type: object
+      properties:
+        log:
+          description: log maps to the entry
+          allOf:
+            - $ref: '#/components/schemas/RefTarget'
     CycleA:
       allOf:
         - $ref: '#/components/schemas/CycleB'

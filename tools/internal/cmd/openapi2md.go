@@ -699,6 +699,15 @@ func generateRootSection(rootName string, schema Schema, spec OpenAPISpec, schem
 			if err != nil {
 				continue
 			}
+			// Preserve the first allOf $ref for type display so
+			// fields like AssessmentFinding.log render as the
+			// linked type name rather than bare "object".
+			if len(prop.AllOf) > 0 && resolvedProp.Ref == "" {
+				firstPart, _ := parseSchema(prop.AllOf[0])
+				if firstPart.Ref != "" {
+					resolvedProp.Ref = firstPart.Ref
+				}
+			}
 			prop = resolvedProp
 			fields = append(fields, fieldInfo{
 				name:     propName,
